@@ -5,30 +5,21 @@ import { AbstractListToolbarAction } from 'sulu-admin-bundle/views';
 import { Requester } from 'sulu-admin-bundle/services';
 import { Dialog } from 'sulu-admin-bundle/components';
 
-/**
- * Abstract base class for bulk actions in Sulu lists
- *
- * Usage:
- * class BulkPublishAction extends AbstractBulkAction {
- *     getActionName() { return 'publish'; }
- *     getIcon() { return 'su-eye'; }
- * }
- */
 export default class AbstractBulkAction extends AbstractListToolbarAction {
     @observable showDialog = false;
     @observable loading = false;
 
     resourceKey = '';
-    translationPrefix = '';
+    translationPrefix = 'sulu_bulk_actions';
+    config = {};
 
-    constructor(listStore, listAdapterStore, router, options = {}) {
+    constructor(listStore, listAdapterStore, router, locales, resourceStore, options = {}) {
         super(listStore, listAdapterStore, router);
 
-        if (options.resourceKey) {
-            this.resourceKey = options.resourceKey;
-        }
-        if (options.translationPrefix) {
-            this.translationPrefix = options.translationPrefix;
+        this.resourceKey = this.listStore.resourceKey;
+
+        if (options.config) {
+            this.config = options.config;
         }
 
         this.handleClick = this.handleClick.bind(this);
@@ -37,34 +28,20 @@ export default class AbstractBulkAction extends AbstractListToolbarAction {
         this.executeAction = this.executeAction.bind(this);
     }
 
-    /**
-     * Override: Return the action name (e.g., 'publish', 'unpublish', 'delete')
-     */
     getActionName() {
         throw new Error('getActionName() must be implemented by subclass');
     }
 
-    /**
-     * Override: Return the icon name (e.g., 'su-eye', 'su-eye-slash')
-     */
     getIcon() {
-        return 'su-eye';
+        return 'su-eye'; // Default
     }
 
-    /**
-     * Override: Return custom API endpoint if needed
-     * Default: /admin/api/{resourceKey}/bulk-{action}
-     */
     getApiEndpoint() {
         return `/admin/api/${this.resourceKey}/bulk-${this.getActionName()}`;
     }
 
-    /**
-     * Override: Return translation key suffix
-     * Default: 'bulk_{action}'
-     */
     getTranslationKey() {
-        return `bulk.${this.getActionName()}`;
+        return `${this.getActionName()}`;
     }
 
     getToolbarItemConfig() {
@@ -80,24 +57,20 @@ export default class AbstractBulkAction extends AbstractListToolbarAction {
         };
     }
 
-    @action
-    handleClick() {
+    @action handleClick() {
         this.showDialog = true;
     }
 
-    @action
-    handleConfirm() {
+    @action handleConfirm() {
         this.showDialog = false;
         this.executeAction();
     }
 
-    @action
-    handleCancel() {
+    @action handleCancel() {
         this.showDialog = false;
     }
 
-    @action
-    executeAction() {
+    @action executeAction() {
         this.loading = true;
 
         const ids = this.listStore.selections.map(item => item.id);
