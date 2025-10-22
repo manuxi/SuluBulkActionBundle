@@ -16,7 +16,8 @@ class SuluBulkActionsExtension extends Extension implements PrependExtensionInte
             $container,
             new FileLocator(__DIR__.'/../Resources/config')
         );
-        //$loader->load('services.xml');
+        $loader->load('services.xml');
+        $loader->load('controller.xml');
     }
 
     public function prepend(ContainerBuilder $container): void

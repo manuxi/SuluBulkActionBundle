@@ -5,6 +5,8 @@
                                https://symfony.com/schema/dic/services/services-1.0.xsd">
 
     <services>
-
+        <!--Handler-->
+        <service id="sulu_bulk_actions.handler_registry" class="Manuxi\SuluBulkActionsBundle\Handler\BulkActionHandlerRegistry" public="true">
+        </service>
     </services>
 </container>
